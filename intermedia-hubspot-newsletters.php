@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Intermedia HubSpot Newsletters
  * Plugin URI:        https://www.intermedia.com.au/
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       This is a plugin to connect the WordPress site to Hubspot plattform and populate Databases for newsletters purposes.
  * Version:           1.0.0
  * Author:            Jose Anton
  * Author URI:        https://www.intermedia.com.au/
