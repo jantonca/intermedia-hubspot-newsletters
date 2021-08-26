@@ -1,0 +1,49 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+ .entities-box label {
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+ .entities-box .select2-container {
+    width: 80%!important;
+}
+.entities-box .select2-container--classic .select2-search--inline .select2-search__field {
+    min-width: 500px;
+}
+.entities-box .select2-container--classic .select2-selection--multiple .select2-selection__choice {
+    background-color: #000000;
+    border: 0px solid #fff;
+    border-radius: 16px;
+    cursor: default;
+    float: left;
+    margin-right: 8px;
+    margin-top: 8px;
+    padding: 8px 16px;
+    color: white;
+    font-size: 1rem;
+}
+.entities-box .select2-container--classic .select2-selection--multiple .select2-selection__choice__remove {
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 6px;
+    font-size: 1rem;
+}
+
+th#hubspot_row_id {
+    width: 7rem;
+}
+th#hubspot_type {
+    width: 9rem;
+}
+td.col-action {
+    float: right;
+    clear: both;
+}
+th#hubspot_row_action {
+    width: 7rem;
+}
