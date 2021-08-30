@@ -159,7 +159,6 @@ class WP_REST_Intermedia_newsletters_Posts {
     //     );
     //     $options = array();
     //     foreach ( $post_types as $post_type ) {
-	// 		//var_dump($post_type->name);
     //         if ( 'product' === $post_type->name ) {
     //             continue;
     //         }

@@ -157,7 +157,6 @@ class Intermedia_HubDB_Actions {
 				<tr>
 					<th scope="col" id="hubspot_row_id" class="column-hubspot-row_id">Row ID</th>
 					<?php foreach ( $response_columns->data->columns as $column ): ?>
-						<?php //var_dump($response_columns->data->columns); ?>
 						<th scope="col" id="hubspot_<?php echo $column->name; ?>" class="column-hubspot-<?php echo $column->name; ?>"><?php echo $column->label; ?> (<?php echo $column->name; ?>) ID: <?php echo $column->id; ?></th>
 					<?php endforeach; ?>
 					<th scope="col" id="hubspot_row_action" class="column-hubspot-row_action"> </th>
