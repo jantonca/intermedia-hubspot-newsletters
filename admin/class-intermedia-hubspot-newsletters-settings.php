@@ -188,7 +188,7 @@ class Intermedia_Hubspot_Newsletters_Admin_Settings {
 
                     }
 					if( array_key_exists( 'update_table_row', $_POST ) ) {
-						//var_dump($_POST['update_table_row']);
+
                         Intermedia_HubDB_Actions::update_table_row( $hubspot_settings[ 'hapikey'], Intermedia_HubDB_Actions::get_hubspot_id(), $hubspot_settings[ 'hubdb'], $_POST['update_table_row'] );
 
                     }
@@ -590,7 +590,7 @@ class Intermedia_Hubspot_Newsletters_Admin_Settings {
 		);
 
 		foreach ( $args['options'] as $val => $title ) {
-			var_dump($val);
+
 			printf(
 				'<option value="%1$s" %2$s>%3$s</option>',
 				$val,
