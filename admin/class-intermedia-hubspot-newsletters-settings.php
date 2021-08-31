@@ -253,7 +253,7 @@ class Intermedia_Hubspot_Newsletters_Admin_Settings {
 	 */
 	public function intermedia_hubspot_newsletters_hubspot_settings_callback() {
 
-		highlight_string("<?php \n\$hubspot_settings =\n" . var_export( get_option( $this->hubspot_settings ), true ) . ";\n ?>");
+		/* highlight_string("<?php \n\$hubspot_settings =\n" . var_export( get_option( $this->hubspot_settings ), true ) . ";\n ?>"); */
 
 		echo '<p>' . __( 'Settings for connecting to HubSpot throught an API KEY and select the hubspot_table to work with.', $this->plugin_name ) . '</p>';
 
