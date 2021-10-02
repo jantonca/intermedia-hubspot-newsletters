@@ -1,5 +1,0 @@
-{
-    "require": {
-        "hubspot/hubspot-php": "^3.0"
-    }
-}
