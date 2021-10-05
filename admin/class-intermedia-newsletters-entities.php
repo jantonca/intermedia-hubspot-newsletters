@@ -250,10 +250,9 @@ class Intermedia_newsletters_Entities {
         if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;
 
         $entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
-        $cpt_included = $entities_options['cpt_included'];
 
         // if post type is different from our selected one, do nothing
-        if ( isset( $cpt_included ) && in_array( $post->post_type, $cpt_included ) ) {
+        if ( isset( $entities_options['cpt_included'] ) && in_array( $post->post_type, $entities_options['cpt_included'] ) ) {
 
             if( isset( $_POST['entities_select_positions'] ) && isset( $_POST[ '_inline_edit' ] ) && wp_verify_nonce( sanitize_text_field( $_POST[ '_inline_edit' ] ), 'inlineeditnonce' ) )
 
@@ -450,10 +449,9 @@ class Intermedia_newsletters_Entities {
         return $post_id;
 
         $entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
-        $cpt_included = $entities_options['cpt_included'];
 
         // if post type is different from our selected one, do nothing
-        if ( isset( $cpt_included ) && in_array( get_post_type( $post_id ), $cpt_included ) ) {
+        if ( isset( $entities_options['cpt_included'] ) && in_array( get_post_type( $post_id ), $entities_options['cpt_included'] ) ) {
             
             if( isset( $_POST['entities_select_positions'] ) ) {
 
