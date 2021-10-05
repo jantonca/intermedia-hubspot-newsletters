@@ -23,12 +23,6 @@ class WP_REST_Intermedia_newsletters_Posts {
 	 */
 	public static function posts_endpoint() {
 
-		$entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
-        //$cpt_included = $entities_options['cpt_included'];
-
-		//$per_page = count(self::get_newsletter_positions());
-		//$post_type = $cpt_included;
-
 		$posts_ids = WP_REST_Intermedia_newsletters_Posts::get_posts_ids_entities();
 
 		if( $posts_ids ){
@@ -56,13 +50,7 @@ class WP_REST_Intermedia_newsletters_Posts {
 					'excerpt' => get_the_excerpt( $post_id ),
 					'image_source' => get_the_post_thumbnail_url( $post_id, $image_crop ),
 				];
-				$add_ons = [
-					// 'post_type'     => 'x',
-					// 'position' => 'xx',
-					// 'intermedia_category_info'          => 'xxx',
-					// 'intermedia_article_classes'        => 'xxxx',
-					// 'intermedia_author_info'            => 'xxxxx',
-				];
+				$add_ons = [];
 				$posts[] = array_merge( $data, $add_ons );
 			}
 	
@@ -106,7 +94,7 @@ class WP_REST_Intermedia_newsletters_Posts {
 	public static function import_csv_config_endpoint() {
 
 		$output = json_decode(
-			file_get_contents( __DIR__ . '/../json_config.json' ), // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			file_get_contents( __DIR__ . '/../json_config.json' ),
 			true
 		);
 
@@ -141,43 +129,6 @@ class WP_REST_Intermedia_newsletters_Posts {
 	
 		return $all_positions;
 	}
-
-	/**
-    * Get Post Types.
-    *
-    * @since 1.11.0
-    * @access public
-    */
-    // public static function get_post_types() {
-
-    //     $post_types = get_post_types(
-    //         array(
-    //             'public'       => true,
-    //             'show_in_rest' => true,
-    //         ),
-    //         'objects'
-    //     );
-    //     $options = array();
-    //     foreach ( $post_types as $post_type ) {
-    //         if ( 'product' === $post_type->name ) {
-    //             continue;
-    //         }
-
-    //         if ( 'attachment' === $post_type->name ) {
-    //             continue;
-    //         }
-
-	// 		if ( 'ai1ec_event' === $post_type->name ) {
-	// 			$options[] = $post_type->name;
-	// 			continue;
-    //         }
-
-    //         $options[] = $post_type->name;
-    //     }
-
-    //     return apply_filters( 'intermedia_post_types', $options );
-
-    // }
 
 	public static function select_get_post_types() {
 
@@ -270,15 +221,69 @@ class WP_REST_Intermedia_newsletters_Posts {
 	public static function get_posts_ids_entities() {
 
 		$positions = Intermedia_newsletters_Entities::create_entities_positions();
+		
 		$posts_ids = [];
 		$positions_ids = [];
+
+		$current_site_entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
+        
+        if ( 
+            isset( $current_site_entities_options['subsites_included'] ) && 
+            !empty ( $current_site_entities_options['subsites_included'] ) &&
+			isset( $current_site_entities_options['cpt_included']  ) && 
+            !empty ( $current_site_entities_options['cpt_included']  )
+        ) {
+			
+			if ( isset( $positions ) && !empty( $positions ) ) {
+
+				foreach ( $positions as $position ) {
+
+					foreach ( $current_site_entities_options['subsites_included'] as $subsite_id ) {
+						switch_to_blog( (int) $subsite_id );
+						$cpt_included = $current_site_entities_options['cpt_included'];
+			
+						$args = array(
+							'posts_per_page' => -1, // this gets all posts, you may only want to get a few at a time
+							'post_type' => $cpt_included,
+							'meta_query' => array(
+								array(
+									'key' => 'entities_select_positions',
+									'value' => $position,
+									'compare' => 'LIKE'
+								)
+							),
+							'fields' => 'ids'
+						);
+						$post_id = get_posts( $args );
+						if( $post_id ) {
+
+							$posts_ids[ $position ][$subsite_id] = $post_id;
+							$positions_ids[ $position ] = $post_id[ 0 ];
+			
+						}
 		
-		if ( isset( $positions ) && !empty( $positions ) ) {
+						restore_current_blog();
+		
+					}
+		
+				}
+		
+				$output = array( 
+					'posts_ids' => $posts_ids, 
+					'positions_ids' => $positions_ids 
+				);
+
+				return $output;
+	
+			}
+
+		}
+		
+		if ( isset( $positions ) && !empty( $positions ) && isset( $current_site_entities_options['cpt_included'] ) && !empty ( $current_site_entities_options['cpt_included'] ) ) {
 
 			foreach ( $positions as $position ) {
 
-				$entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
-				$cpt_included = $entities_options['cpt_included'];
+				$cpt_included = $current_site_entities_options['cpt_included'];
 	
 				$args = array(
 					'posts_per_page' => 1, // this gets all posts, you may only want to get a few at a time
@@ -309,7 +314,7 @@ class WP_REST_Intermedia_newsletters_Posts {
 				'posts_ids' => $posts_ids, 
 				'positions_ids' => $positions_ids 
 			);
-	
+
 			return $output;
 
 		}
@@ -323,10 +328,10 @@ class WP_REST_Intermedia_newsletters_Posts {
     * @access public
     */
 	public static function get_registered_crops_attachments() {
-     
-		$img_thumbnails = get_intermediate_image_sizes();
 		
-		return $img_thumbnails;
+		$image_subsizes = array_keys( wp_get_registered_image_subsizes() );
+		
+		return $image_subsizes;
 		
 	}
 	

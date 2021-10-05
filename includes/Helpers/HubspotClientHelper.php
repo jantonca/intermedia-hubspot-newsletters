@@ -12,12 +12,14 @@ class HubspotClientHelper
 
     public static function createFactory(): Factory
     {
-        //$accessToken = OAuth2Helper::refreshAndGetAccessToken();
+
         $options = get_option('intermedia_hubspot_newsletters_hubspot_settings');
+        
         return self::create([
             'key' => $options['hapikey'],
             'oauth2' => false,
         ]);
+
     }
 
     public static function getOAuth2Resource(): OAuth2

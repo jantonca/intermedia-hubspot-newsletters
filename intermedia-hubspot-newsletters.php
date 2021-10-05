@@ -9,14 +9,14 @@
  * that starts the plugin.
  *
  * @link              https://www.intermedia.com.au/
- * @since             1.0.1
+ * @since             1.0.2
  * @package           Intermedia_Hubspot_Newsletters
  *
  * @wordpress-plugin
  * Plugin Name:       Intermedia HubSpot Newsletters
  * Plugin URI:        https://www.intermedia.com.au/
  * Description:       This is a plugin to connect the WordPress site to Hubspot plattform and populate Databases for newsletters purposes.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Author:            Jose Anton
  * Author URI:        https://www.intermedia.com.au/
  * License:           GPL-2.0+
@@ -32,10 +32,10 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Start at version 1.0.2 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'INTERMEDIA_HUBSPOT_NEWSLETTERS_VERSION', '1.0.0' );
+define( 'INTERMEDIA_HUBSPOT_NEWSLETTERS_VERSION', '1.0.2' );
 
 // =============================================
 // Define Constants

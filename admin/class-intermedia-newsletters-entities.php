@@ -16,7 +16,7 @@
 class Intermedia_newsletters_Entities {
 
     public static function create_entities_positions(){
-
+        
         $entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
 
         if ( isset( $entities_options['site_prefix'] ) && !empty( $entities_options['site_prefix'] ) && isset( $entities_options['newsletters_entities_number'] ) && !empty( $entities_options['newsletters_entities_number'] ) ) {
@@ -34,6 +34,64 @@ class Intermedia_newsletters_Entities {
                     
                 }   
     
+            }
+    
+            return $positions;
+
+        }
+
+    }
+
+    public static function create_entities_positions_multisite(){
+
+        $current_site_entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
+        
+        if ( 
+            isset( $current_site_entities_options['subsites_included'] ) && 
+            !empty ( $current_site_entities_options['subsites_included'] ) &&
+            isset( $current_site_entities_options['site_prefix'] ) && 
+            !empty( $current_site_entities_options['site_prefix'] ) && 
+            isset( $current_site_entities_options['newsletters_entities_number'] ) && 
+            !empty( $current_site_entities_options['newsletters_entities_number'] ) &&
+            isset( $current_site_entities_options['newsletters_entities'] ) && 
+            !empty( $current_site_entities_options['newsletters_entities'] ) 
+        ) {
+            foreach ( $current_site_entities_options['subsites_included'] as $subsite_id ) {
+
+                switch_to_blog( (int) $subsite_id );
+
+                $entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
+
+                if( 
+                    isset( $entities_options['newsletters_entities_number'] ) && 
+                    !empty( $entities_options['newsletters_entities_number'] )  
+                ) {
+
+                    $site_prefix = $entities_options['site_prefix'];
+                    $newsletters_entities_number = (int) $entities_options['newsletters_entities_number'];
+        
+                    $entities = $entities_options['newsletters_entities'];
+        
+                    for ( $i=0; $i < $newsletters_entities_number; $i++ ) {
+                        if( 
+                            isset( $entities[$i]['amount'] ) && 
+                            !empty( $entities[$i]['amount'] ) &&
+                            isset( $entities[$i]['name'] ) && 
+                            !empty( $entities[$i]['name'] )
+                        ) {
+                            for ($n=1; $n <= $entities[$i]['amount']; $n++) { 
+            
+                                $positions[] = $site_prefix.'_'.$entities[$i]['name'].'_'.$n;
+                                
+                            } 
+                        }
+  
+                    }
+
+                }
+
+                restore_current_blog();
+
             }
     
             return $positions;
@@ -81,8 +139,8 @@ class Intermedia_newsletters_Entities {
                 'Newsletters positions', // title
                 array( $this, 'entities_metabox_callback' ),
                 $entities_options['cpt_included'], // post type or post types in array
-                'normal', // position (normal, side, advanced)
-                'default' // priority (default, low, high, core)
+                'normal',
+                'default'
     
             );
 
@@ -125,7 +183,17 @@ class Intermedia_newsletters_Entities {
     
         $appended_positions = get_post_meta( $post_object->ID, 'entities_select_positions',true );
 
-        if( $positions = self::create_entities_positions() ) {
+        if( is_multisite() ) {
+
+            $positions = self::create_entities_positions_multisite();
+
+        } else {
+
+            $positions = self::create_entities_positions();
+            
+        }
+
+        if( $positions ) {
 
             ob_start(); ?>
 
@@ -139,7 +207,7 @@ class Intermedia_newsletters_Entities {
 
                     <?php $selected = ( is_array( $appended_positions ) && in_array( $position, $appended_positions ) ) ? ' selected="selected"' : ''; ?>
 
-                    <option value="<?php echo $position; ?>" <?php echo $selected; ?> ><?php echo $position; ?></option>
+                    <option value="<?php echo esc_attr( $position ); ?>" <?php echo esc_attr( $selected ); ?> ><?php echo esc_html( $position ); ?></option>
 
                 <?php endforeach; ?>
 
@@ -148,24 +216,48 @@ class Intermedia_newsletters_Entities {
 
             <?php $output =  ob_get_clean(); ?>
 
-            <?php echo $output;
+            <?php
+
+                $allowed_html = array(
+                    'p' => array(
+                        'class'  => array(),
+                    ),
+                    'label' => array(
+                        'for'  => array(),
+                    ),
+                    'select' => array(
+                        'class'  => array(),
+                        'id'    => array(),
+                        'name'  => array(),
+                        'multiple' => array()
+                    ),
+                    'option' => array(
+                        'position'  => array(),
+                        'selected'    => array(),
+                    ),
+                );
+
+            ?>
+
+            <?php echo wp_kses( $output, $allowed_html );
+
         }
         
     }
 
     public function entities_save_metaboxdata( $post_id, $post ) {
-	
+
         if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return $post_id;
 
         $entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
         $cpt_included = $entities_options['cpt_included'];
 
         // if post type is different from our selected one, do nothing
-        if ( in_array( $post->post_type, $cpt_included ) ) {
+        if ( isset( $cpt_included ) && in_array( $post->post_type, $cpt_included ) ) {
 
-            if( isset( $_POST['entities_select_positions'] ) )
+            if( isset( $_POST['entities_select_positions'] ) && isset( $_POST[ '_inline_edit' ] ) && wp_verify_nonce( sanitize_text_field( $_POST[ '_inline_edit' ] ), 'inlineeditnonce' ) )
 
-                update_post_meta( $post_id, 'entities_select_positions', $_POST['entities_select_positions'] );
+                update_post_meta( $post_id, 'entities_select_positions', sanitize_text_field( $_POST['entities_select_positions'] ) );
 
             else
 
@@ -237,7 +329,7 @@ class Intermedia_newsletters_Entities {
 
                 if ( isset( $entities_select_positions ) && $entities_select_positions !== '' ) {
 
-                    echo implode( ', ', $entities_select_positions);
+                    echo esc_html( implode( ', ', $entities_select_positions ) );
 
                 }
 
@@ -276,7 +368,17 @@ class Intermedia_newsletters_Entities {
 
         if ( 'entities_select_positions' == $column_name ) {
 
-            if( $positions = self::create_entities_positions() ) {
+            if( is_multisite() ) {
+
+                $positions = self::create_entities_positions_multisite();
+    
+            } else {
+    
+                $positions = self::create_entities_positions();
+                
+            }
+
+            if( $positions ) {
 
                 ob_start(); ?>
             
@@ -288,7 +390,7 @@ class Intermedia_newsletters_Entities {
 
                         <?php foreach( $positions as $position ): ?>
 
-                            <option id="<?php echo $position; ?>" value="<?php echo $position; ?>" ><?php echo $position; ?></option>
+                            <option id="<?php echo esc_attr( $position ); ?>" value="<?php echo esc_attr( $position ); ?>" ><?php echo esc_html( $position ); ?></option>
 
                         <?php endforeach; ?>
 
@@ -298,7 +400,33 @@ class Intermedia_newsletters_Entities {
 
                 <?php $output =  ob_get_clean(); ?>
 
-                <?php echo $output;
+                <?php
+
+                    $allowed_html = array(
+                        'fieldset' => array(
+                            'class'  => array(),
+                        ),
+                        'div' => array(
+                            'class'  => array(),
+                        ),
+                        'label' => array(
+                            'for'  => array(),
+                        ),
+                        'select' => array(
+                            'class'  => array(),
+                            'id'    => array(),
+                            'name'  => array(),
+                            'multiple' => array()
+                        ),
+                        'option' => array(
+                            'id'    => array(),
+                            'value'  => array(),
+                        ),
+                    );
+
+                ?>
+
+                <?php echo wp_kses( $output, $allowed_html );
 
             }
             
@@ -316,19 +444,28 @@ class Intermedia_newsletters_Entities {
         if ( !current_user_can( 'edit_post', $post_id ) ) {
             return;
         }
+        
+        // verify quick edit nonce
+        if ( isset( $_POST[ '_inline_edit' ] ) && ! wp_verify_nonce( sanitize_text_field( $_POST[ '_inline_edit' ] ), 'inlineeditnonce' ) )
+        return $post_id;
+
         $entities_options = get_option('intermedia_hubspot_newsletters_newsletters_settings');
         $cpt_included = $entities_options['cpt_included'];
 
         // if post type is different from our selected one, do nothing
-        if ( in_array( get_post_type( $post_id ), $cpt_included ) ) {
+        if ( isset( $cpt_included ) && in_array( get_post_type( $post_id ), $cpt_included ) ) {
+            
+            if( isset( $_POST['entities_select_positions'] ) ) {
 
-            if( isset( $_POST['entities_select_positions'] ) )
+                $entities_select_positions = array_map( 'sanitize_text_field', $_POST['entities_select_positions'] );
 
-                update_post_meta( $post_id, 'entities_select_positions', $_POST['entities_select_positions'] );
+                update_post_meta( $post_id, 'entities_select_positions', $entities_select_positions );
 
-            else
+            } else {
 
                 delete_post_meta( $post_id, 'entities_select_positions' );
+
+            }
                 
         }
 

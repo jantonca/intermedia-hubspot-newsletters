@@ -98,13 +98,6 @@ class WP_REST_Intermedia_newsletters extends WP_REST_Controller {
 						'type'    => 'integer',
 						'default' => 55,
 					],
-					'exclude'        => [
-						'type'    => 'array',
-						'items'   => array(
-							'type' => 'integer',
-						),
-						'default' => array(),
-					],
 					'include'        => [
 						'type'    => 'array',
 						'items'   => array(

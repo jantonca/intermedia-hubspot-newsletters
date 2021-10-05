@@ -2,16 +2,19 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
- .entities-box label {
+.entities-box label {
     font-size: 1rem;
     display: block;
     margin-bottom: 0.5rem;
 }
- .entities-box .select2-container {
+.entities-box .select2-container {
     width: 80%!important;
 }
 .entities-box .select2-container--classic .select2-search--inline .select2-search__field {
     min-width: 500px;
+}
+.select2-container--classic .select2-selection--multiple {
+    overflow: hidden;
 }
 .entities-box .select2-container--classic .select2-selection--multiple .select2-selection__choice {
     background-color: #000000;

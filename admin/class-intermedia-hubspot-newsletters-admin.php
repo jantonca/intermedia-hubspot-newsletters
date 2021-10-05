@@ -84,9 +84,6 @@ class Intermedia_Hubspot_Newsletters_Admin {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-intermedia-newsletters-entities.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-intermedia-newsletters-api-controller.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-intermedia-newsletters-posts-api.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-intermedia-newsletters-ajax-handler.php';
-		//require_once plugin_dir_path( dirname( __FILE__ ) ) .  'includes/Helpers/OAuth2Helper.php';
-		//require_once plugin_dir_path( dirname( __FILE__ ) ) .  'includes/Helpers/UrlHelper.php';
 
 	}
 
